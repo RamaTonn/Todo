@@ -27,6 +27,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
@@ -52,10 +53,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.lerp
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ramatonn.todo.R
 import com.ramatonn.todo.data.Task
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TaskItem(task: Task, viewModel: TaskListViewModel) {
@@ -129,27 +132,28 @@ fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
     val noStrike = MaterialTheme.typography.headlineSmall
 
 
-    Card(onClick = { onclick() }, modifier = Modifier.padding(6.dp)) {
-        Row {
+    Column{
+        Row(modifier = Modifier.clickable { onclick() }, verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = task.complete,
                 onCheckedChange = {
                     viewModel.onEvent(TaskListEvent.OnCompletedChange(task, it))
 
                 })
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column {
                 Text(
-                    modifier = Modifier.fillMaxHeight(),
                     text = task.title,
                     style = if (task.complete) {
                         strike
                     } else {
                         noStrike
-                    })
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
 
-                if (!(task.deadlineDate == null && task.deadlineTime == null)){
-                    Card {
-
+                if (task.deadlineDate != null ){
+                    Card(modifier = Modifier.padding(2.dp), shape = MaterialTheme.shapes.small) {
+                        Text(text = task.deadlineDate.format(DateTimeFormatter.ofPattern("d, MMM")), modifier = Modifier.padding(2.dp))
                     }
                 }
             }
@@ -160,6 +164,7 @@ fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
 
             }
         }
+        Divider()
     }
 }
 
