@@ -31,6 +31,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
@@ -79,9 +80,13 @@ fun TaskItem(task: Task, viewModel: TaskListViewModel) {
             .height(56.dp)
     ) {
         Checkbox(
-            checked = task.complete,
-            onCheckedChange = { viewModel.onEvent(TaskListEvent.OnCompletedChange(task = task, it)) },
-            modifier = Modifier.size(24.dp)
+            checked = task.complete, onCheckedChange = {
+                viewModel.onEvent(
+                    TaskListEvent.OnCompletedChange(
+                        task = task, it
+                    )
+                )
+            }, modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.size(20.dp))
         Text(text = task.title)
@@ -89,7 +94,7 @@ fun TaskItem(task: Task, viewModel: TaskListViewModel) {
         Spacer(modifier = Modifier.weight(1.0f))  //<------- THIS SPACER
 
         OutlinedIconButton(
-            onClick = {viewModel.onEvent(TaskListEvent.OnTaskEditClick(task = task))},
+            onClick = { viewModel.onEvent(TaskListEvent.OnTaskEditClick(task = task)) },
             modifier = Modifier.size(36.dp),
             border = ButtonDefaults.outlinedButtonBorder,
             shape = RoundedCornerShape(4.dp)
@@ -103,7 +108,7 @@ fun TaskItem(task: Task, viewModel: TaskListViewModel) {
         }
         Spacer(modifier = Modifier.size(20.dp))
         OutlinedIconButton(
-            onClick = {viewModel.onEvent(TaskListEvent.DeleteTaskClick(task = task))},
+            onClick = { viewModel.onEvent(TaskListEvent.DeleteTaskClick(task = task)) },
             modifier = Modifier.size(36.dp),
             border = ButtonDefaults.outlinedButtonBorder,
             shape = RoundedCornerShape(4.dp)
@@ -119,6 +124,8 @@ fun TaskItem(task: Task, viewModel: TaskListViewModel) {
     }
 }
 
+/*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
@@ -127,14 +134,14 @@ fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
         mutableStateOf(false)
     }
 
-    val strike = MaterialTheme.typography.headlineSmall.copy(textDecoration = TextDecoration.LineThrough)
+    val strike = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.LineThrough)
 
-    val noStrike = MaterialTheme.typography.headlineSmall
+    val noStrike = MaterialTheme.typography.bodyLarge
 
 
-    Column{
         Row(modifier = Modifier.clickable { onclick() }, verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 checked = task.complete,
                 onCheckedChange = {
                     viewModel.onEvent(TaskListEvent.OnCompletedChange(task, it))
@@ -157,15 +164,78 @@ fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
                     }
                 }
             }
+            
             Spacer(modifier = Modifier.weight(1f))
+            
             IconToggleButton(checked = fav, onCheckedChange = { fav = !fav }) {
-                if(!fav) { Icon(imageVector = ImageVector.vectorResource(id = R.drawable.round_star_border_24), contentDescription = "Favourite") }
-                else { Icon(imageVector = ImageVector.vectorResource(id = R.drawable.round_star_24), contentDescription = "Favourite", tint = MaterialTheme.colorScheme.secondary) }
+                if(!fav) { Icon(
+modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+ imageVector = ImageVector.vectorResource(id = R.drawable.round_star_border_24), contentDescription = "Favourite") }
+                else { Icon(
+modifier = Modifier.padding(start = 16.dp, end = 24.dp),
+ imageVector = ImageVector.vectorResource(id = R.drawable.round_star_24), contentDescription = "Favourite", tint = MaterialTheme.colorScheme.secondary) }
 
             }
         }
         Divider()
+
+}
+*/
+
+@Composable
+fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
+
+    var fav by remember {
+        mutableStateOf(false)
     }
+
+    ListItem(
+        headlineContent = {
+            Column {
+                Text(
+                    text = task.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if (task.deadlineDate != null) {
+                    Card(modifier = Modifier.padding(2.dp), shape = MaterialTheme.shapes.small) {
+                        Text(
+                            text = task.deadlineDate.format(DateTimeFormatter.ofPattern("d, MMM")),
+                            modifier = Modifier.padding(2.dp)
+                        )
+                    }
+                }
+            }
+        },
+        leadingContent = {
+            Checkbox(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                checked = task.complete,
+                onCheckedChange = {
+                    viewModel.onEvent(TaskListEvent.OnCompletedChange(task, it))
+
+                })
+        },
+        trailingContent = {
+            IconToggleButton(checked = fav, onCheckedChange = { fav = !fav }) {
+                if (!fav) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.round_star_border_24),
+                        contentDescription = "Favourite"
+                    )
+                } else {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.round_star_24),
+                        contentDescription = "Favourite",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+            }
+        },
+        )
+    Divider()
 }
 
 @Composable
