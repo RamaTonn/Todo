@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -203,7 +204,7 @@ fun TaskScreen(
                     }),
                     maxLines = 1
                 )
-                Row(modifier = Modifier.padding(4.dp)) {
+                Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                     when (deadlineDate) {
                         null -> IconButton(onClick = { showDateDialog = true }) {
                             Icon(
@@ -212,8 +213,8 @@ fun TaskScreen(
                             )
                         }
 
-                        else -> Card {
-                            Text(text = deadlineDate!!.format(DateTimeFormatter.ofPattern("d, MMM")))
+                        else -> Card(modifier = Modifier.padding(2.dp), shape = MaterialTheme.shapes.small) {
+                            Text(text = deadlineDate!!.format(DateTimeFormatter.ofPattern("d, MMM")), modifier = Modifier.padding(2.dp))
                         }
                     }
                     IconButton(onClick = { /*TODO*/ }) {
