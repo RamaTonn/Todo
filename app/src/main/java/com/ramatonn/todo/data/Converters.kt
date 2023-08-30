@@ -49,11 +49,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromList(list: List<Int>): String{/*
-        var result = ""
-        for (i in list){
-            result+="$i,"
-        }*/
+    fun fromList(list: List<Int>): String{
         return list.joinToString(",")
     }
 

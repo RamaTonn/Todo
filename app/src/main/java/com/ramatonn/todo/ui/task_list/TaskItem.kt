@@ -26,6 +26,7 @@ import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,7 +60,10 @@ import androidx.compose.ui.unit.dp
 import com.ramatonn.todo.R
 import com.ramatonn.todo.data.Task
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.Period
 import java.time.format.DateTimeFormatter
+import kotlin.math.absoluteValue
 
 @Composable
 fun TaskItem(task: Task, viewModel: TaskListViewModel) {
@@ -200,9 +204,13 @@ fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
 
                 if (task.deadlineDate != null) {
                     Card(modifier = Modifier.padding(2.dp), shape = MaterialTheme.shapes.small) {
+                        val (formattedString, isFuture) = task.deadlineDate.formatRelativeDate(
+                            LocalDate.now()
+                        )
                         Text(
-                            text = task.deadlineDate.format(DateTimeFormatter.ofPattern("d, MMM")),
-                            modifier = Modifier.padding(2.dp)
+                            text = formattedString,
+                            modifier = Modifier.padding(2.dp),
+                            color = if (isFuture) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -234,7 +242,8 @@ fun TaskView(task: Task, viewModel: TaskListViewModel, onclick: () -> Unit) {
 
             }
         },
-        )
+        modifier = Modifier.clickable { onclick() }
+    )
     Divider()
 }
 
@@ -264,4 +273,55 @@ fun animateTextStyleAsState(
     }
 
     return textStyleState
+}
+
+fun LocalDate.formatRelativeDate(date: LocalDate): Pair<String, Boolean> {
+
+    val period = date.until(this)
+
+    val years = period.years.absoluteValue
+
+    val months = period.months.absoluteValue
+
+    val days = period.days.absoluteValue
+
+    var string = ""
+
+    val isFuture = !(period.days < 0 || period.months < 0 || period.years < 0)
+
+    if (period.isZero) {
+        return Pair("Today", isFuture)
+    }
+
+    else if (isFuture) {
+        string = this.format(DateTimeFormatter.ofPattern("d, MMM"))
+    }
+
+    else {
+        if (years > 0) {
+            string = when (years) {
+                1 -> "1 year ago"
+                else -> "$years years ago"
+            }
+        }
+       else if (months > 0) {
+            string = when (months) {
+                1 -> "1 month ago"
+                else -> "$months months ago"
+            }
+        }
+       else if (days > 7) {
+            string = when (days % 7) {
+                1 -> "1 week ago"
+                else -> "${days % 7} weeks ago"
+            }
+        } else {
+            string = when (days) {
+                1 -> "Yesterday"
+                else -> "$days days ago"
+            }
+        }
+    }
+
+    return Pair(string, isFuture)
 }

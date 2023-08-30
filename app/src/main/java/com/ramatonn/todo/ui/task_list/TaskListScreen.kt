@@ -5,13 +5,20 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
@@ -25,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramatonn.todo.data.Task
 import com.ramatonn.todo.ui.task_screen.TaskScreen
 import com.ramatonn.todo.util.navigation.MyFAB
+import kotlinx.coroutines.launch
 
 //import com.ramcosta.composedestinations.annotation.Destination
 //import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -60,8 +69,10 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
             showBottomSheet.value = true
         }
     }) { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-            items(tasks) {currTask ->
+        LazyColumn(
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+        ) {
+            items(tasks) { currTask ->
                 TaskView(
                     task = currTask,
                     viewModel = viewModel,
@@ -69,6 +80,7 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
                         task = currTask
                         showBottomSheet.value = true
                     })
+
             }
         }
     }
