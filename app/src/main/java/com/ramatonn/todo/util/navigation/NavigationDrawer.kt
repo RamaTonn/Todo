@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.ramatonn.todo.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -45,7 +47,8 @@ fun DrawerBody(
     items: List<MenuItem>,
     selectedItem: MutableState<MenuItem>,
     drawerState: DrawerState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    navController: NavHostController
 ) {
 
     ModalDrawerSheet {
@@ -57,7 +60,7 @@ fun DrawerBody(
             NavigationDrawerItem(modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 icon = {
                     Icon(
-                        imageVector = it.icon,
+                        imageVector = ImageVector.vectorResource(id = it.iconID),
                         contentDescription = null,
                     )
                 },
@@ -65,6 +68,7 @@ fun DrawerBody(
                 onClick = {
                     scope.launch { drawerState.close() }
                     selectedItem.value = it
+                    navController.navigate(it.route)
                 },
                 label = { Text(text = it.text) })
         }
@@ -93,15 +97,11 @@ fun MyTopAppBar(scrollBehavior: TopAppBarScrollBehavior, clicked: () -> Unit, th
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyDrawer(content: @Composable () -> Unit, themeButton: @Composable () -> Unit) {
+fun MyDrawer(content: @Composable () -> Unit, themeButton: @Composable (() -> Unit)? = null, navController: NavHostController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val items = listOf(
-        MenuItem(
-            "tasks", "Tasks", ImageVector.vectorResource(id = R.drawable.round_checklist_24)
-        ), MenuItem("timer", "Timer", ImageVector.vectorResource(id = R.drawable.round_timer_24))
-    )
+    val items = listOf(MenuItem.TaskList,MenuItem.Timer)
 
     val selectedItem = remember { mutableStateOf(items[0]) }
 
@@ -110,7 +110,8 @@ fun MyDrawer(content: @Composable () -> Unit, themeButton: @Composable () -> Uni
             items = items,
             selectedItem = selectedItem,
             drawerState = drawerState,
-            scope = coroutineScope
+            scope = coroutineScope,
+            navController = navController
         )
     }) {
         Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
@@ -119,7 +120,7 @@ fun MyDrawer(content: @Composable () -> Unit, themeButton: @Composable () -> Uni
                 clicked = {
                 coroutineScope.launch { if (drawerState.isClosed) drawerState.open() else drawerState.close() }
             },
-                themeButton = { themeButton() })
+                themeButton = { themeButton?.invoke() })
         }) {
             Surface(modifier = Modifier.padding(it)) {
                 content()

@@ -126,10 +126,6 @@ fun TimerPicker(started: MutableState<Boolean> = mutableStateOf(false)) {
     }
 }
 
-@Composable
-fun TimerProgress(remainingMillis: Long) {
-
-}
 
 fun nanoToString(nanos: Long): String {
     val duration = Duration.ofNanos(nanos)

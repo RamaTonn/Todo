@@ -1,20 +1,22 @@
 package com.ramatonn.todo.util.navigation
-/*
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import com.ramatonn.todo.ui.task_list.TaskListScreen
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.NavGraph
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramatonn.todo.ui.timer.TimerPicker
 
 
-@RootNavGraph(start = true)
-@Destination
 @Composable
-fun ListScreenDestination(navigator: DestinationsNavigator) {
-    MyDrawer(content = {
-        TaskListScreen()
-    })
+fun SetupNavGraph(navController: NavHostController) {
+
+    NavHost(navController = navController, startDestination = Screen.TaskList.route){
+        composable(route = Screen.TaskList.route){
+            TaskListScreen()
+        }
+        composable(route = Screen.Timer.route){
+            TimerPicker()
+        }
+    }
 }
-*/
