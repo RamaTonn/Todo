@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -134,7 +133,10 @@ fun nanoToString(nanos: Long): String {
     val seconds = duration.seconds % 60
     val milliseconds = duration.toMillis() % 1000
 
-    return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds)
+    return when (hours) {
+        0L -> String.format("%02d:%02d.%02d", minutes, seconds, milliseconds)
+        else -> String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds)
+    }
 }
 
 fun stringToNano(string: String): Long {
