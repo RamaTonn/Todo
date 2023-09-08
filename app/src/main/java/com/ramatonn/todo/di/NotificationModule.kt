@@ -17,14 +17,16 @@ import dagger.hilt.android.scopes.ServiceScoped
 @InstallIn(ServiceComponent::class)
 object NotificationModule {
 
-/*    @ServiceScoped
+/*
+    @ServiceScoped
     @Provides
     @Named("Task")
     fun provideTaskNotificationBuilder(
         @ApplicationContext context: Context
     ): NotificationCompat.Builder{
         return NotificationCompat.Builder(context, com.ramatonn.todo.util.TASK_NOTIFICATION_CHANNEL_ID)
-    }*/
+    }
+*/
 
     @ServiceScoped
     @Provides

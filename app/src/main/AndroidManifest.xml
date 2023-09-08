@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".service.ClockService"
+            android:name=".service.StopwatchService"
             android:enabled="true"
             android:exported="false"
             />

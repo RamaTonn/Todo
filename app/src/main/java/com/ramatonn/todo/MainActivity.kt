@@ -13,7 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
-import com.ramatonn.todo.service.ClockService
+import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.ui.theme.ThemeToggleButton
 import com.ramatonn.todo.ui.theme.TodoTheme
 import com.ramatonn.todo.util.navigation.MyDrawer
@@ -24,10 +24,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private var isBound by mutableStateOf(false)
-    private lateinit var service: ClockService
+    private lateinit var service: StopwatchService
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as ClockService.ClockBinder
+            val binder = service as StopwatchService.ClockBinder
             this@MainActivity.service = binder.getService()
             isBound = true
         }
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Intent(this, ClockService::class.java).also { intent ->
+        Intent(this, StopwatchService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }

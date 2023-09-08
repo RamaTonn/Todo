@@ -15,6 +15,7 @@ import com.ramatonn.todo.util.ACTION_SERVICE_RESUME
 import com.ramatonn.todo.util.CLOCK_NOTIFICATION_CHANNEL
 import com.ramatonn.todo.util.CLOCK_NOTIFICATION_CHANNEL_ID
 import com.ramatonn.todo.util.CLOCK_NOTIFICATION_ID
+import com.ramatonn.todo.util.CLOCK_STATE
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Duration
 import java.util.Timer
@@ -22,7 +23,7 @@ import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 
 @AndroidEntryPoint
-class ClockService : Service() {
+class StopwatchService : Service() {
 
     @Inject
 //    @Named("Clock")
@@ -47,17 +48,37 @@ class ClockService : Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when(intent?.getStringExtra(CLOCK_STATE)){
+            ClockState.STARTED.toString() -> {
+                setPauseButton()
+                startForegroundService()
+                startClock()
+            }
+            ClockState.PAUSED.toString() -> {
+                pauseClock()
+                setResumeButton()
+            }
+            ClockState.STOPPED.toString() -> {
+                pauseClock()
+                cancelClock()
+                stopForegroundService()
+            }
+        }
         intent?.action.let {
             when (it) {
                 ACTION_SERVICE_RESUME -> {
+                    clockNotificationBuilder.clearActions()
                     setPauseButton()
+                    setCancelButton()
                     startForegroundService()
                     startClock()
                 }
 
                 ACTION_SERVICE_PAUSE -> {
+                    clockNotificationBuilder.clearActions()
                     pauseClock()
                     setResumeButton()
+                    setCancelButton()
                 }
 
                 ACTION_SERVICE_CANCEL -> {
@@ -125,33 +146,23 @@ class ClockService : Service() {
 
     @SuppressLint("RestrictedApi")
     fun setResumeButton() {
-        clockNotificationBuilder.mActions.removeAt(0)
-        clockNotificationBuilder.mActions.add(
-            0,
-            NotificationCompat.Action(0, "Resume", ServiceHelper.resumePendingIntent(this))
+        clockNotificationBuilder.addAction(0, "Resume", ServiceHelper.resumePendingIntent(this)
         )
     }
 
     @SuppressLint("RestrictedApi")
     fun setPauseButton() {
-        clockNotificationBuilder.mActions.removeAt(0)
-        clockNotificationBuilder.mActions.add(
-            0,
-            NotificationCompat.Action(0, "Pause", ServiceHelper.pausePendingIntent(this))
-        )
+        clockNotificationBuilder.addAction(0, "Pause", ServiceHelper.pausePendingIntent(this))
     }
 
     @SuppressLint("RestrictedApi")
     fun setCancelButton() {
-        clockNotificationBuilder.mActions.removeAt(0)
-        clockNotificationBuilder.mActions.add(
-            0,
-            NotificationCompat.Action(0, "Cancel", ServiceHelper.cancelPendingIntent(this))
+        clockNotificationBuilder.addAction(0, "Cancel", ServiceHelper.cancelPendingIntent(this)
         )
     }
 
     inner class ClockBinder : Binder() {
-        fun getService(): ClockService = this@ClockService
+        fun getService(): StopwatchService = this@StopwatchService
     }
 
     fun millisToFormattedString(millis: Long, clockType: ClockType): String {
@@ -162,7 +173,7 @@ class ClockService : Service() {
         val milliSeconds =
             duration.minusHours(hours).minusMinutes(minutes).minusSeconds(seconds).toMillis()
 
-        return when (clockType) {
+        /*return when (clockType) {
             ClockType.STOPWATCH -> {
                 when (hours) {
                     0L -> String.format("%02d:%02d.%02d", minutes, seconds, milliSeconds)
@@ -182,6 +193,17 @@ class ClockService : Service() {
                     else -> String.format("%02d:%02d:%02d", hours, minutes, seconds)
                 }
             }
+        }*/
+
+        return when (hours) {
+            0L -> String.format("%02d:%02d.%02d", minutes, seconds, milliSeconds/10)
+            else -> String.format(
+                "%02d:%02d:%02d.%02d",
+                hours,
+                minutes,
+                seconds,
+                milliSeconds/10
+            )
         }
     }
 }

@@ -152,13 +152,12 @@ fun stringToNano(string: String): Long {
 
 @Composable
 fun Picker(
-    modifier: Modifier, list: List<String>, onValueChanged: (String) -> Unit, size: Double = 1.0
-) {
+    modifier: Modifier = Modifier, list: List<String>, onValueChanged: (String) -> Unit, size: Double = 1.0, firstVisible: Int = 0) {
 
     val coroutineScope = rememberCoroutineScope()
 
-    var currentValue by remember { mutableStateOf("") }
-    val listState = rememberLazyListState(Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % list.size)
+    var currentValue by remember { mutableStateOf("0") }
+    val listState = rememberLazyListState((Int.MAX_VALUE / 2 - (Int.MAX_VALUE / 2) % list.size)+firstVisible-1)
 
     LaunchedEffect(listState.isScrollInProgress) {
         coroutineScope.launch {
@@ -177,6 +176,7 @@ fun Picker(
             if (it == listState.firstVisibleItemIndex + 1) {
                 currentValue = list[index]
             }
+
             Spacer(modifier = Modifier.height((10 * size).dp))
             Text(
                 modifier = Modifier.alpha(if (it == listState.firstVisibleItemIndex + 1) 1f else 0.3f),
@@ -193,3 +193,4 @@ fun Picker(
         })
     }
 }
+
