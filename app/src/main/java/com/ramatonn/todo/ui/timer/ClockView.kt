@@ -33,10 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.service.ClockState
-import com.ramatonn.todo.service.ClockType
 import com.ramatonn.todo.service.ServiceHelper
+import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.util.ACTION_SERVICE_CANCEL
 import com.ramatonn.todo.util.ACTION_SERVICE_PAUSE
 import com.ramatonn.todo.util.ACTION_SERVICE_RESUME
@@ -56,7 +55,6 @@ fun TopNavigationClockView(
 
 @Composable
 fun StopwatchView(service: StopwatchService) {
-    service.clockType.value = ClockType.STOPWATCH
     val context = LocalContext.current
     val millis by service.timePassedMillis
     val state by service.clockState
@@ -69,7 +67,7 @@ fun StopwatchView(service: StopwatchService) {
         val (stopwatch, lapList, buttons) = createRefs()
         Text(
             modifier = Modifier.constrainAs(stopwatch) { centerTo(parent) },
-            text = service.millisToFormattedString(millis, ClockType.STOPWATCH)
+            text = service.millisToFormattedString(millis)
         )
 
         if (lapped) {
@@ -81,7 +79,7 @@ fun StopwatchView(service: StopwatchService) {
                 width = Dimension.matchParent
             }, horizontalAlignment = Alignment.CenterHorizontally) {
                 items(laps) {
-                    Text(text = service.millisToFormattedString(it, service.clockType.value))
+                    Text(text = service.millisToFormattedString(it))
                 }
             }
         }

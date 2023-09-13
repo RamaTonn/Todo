@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +19,7 @@ import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.ui.theme.ThemeToggleButton
 import com.ramatonn.todo.ui.theme.TodoTheme
 import com.ramatonn.todo.util.navigation.MyDrawer
+import com.ramatonn.todo.util.navigation.Screen
 import com.ramatonn.todo.util.navigation.SetupNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,7 +30,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var service: StopwatchService
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as StopwatchService.ClockBinder
+            val binder = service as StopwatchService.StopwatchBinder
             this@MainActivity.service = binder.getService()
             isBound = true
         }
@@ -43,7 +46,8 @@ class MainActivity : ComponentActivity() {
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }
-
+    /*TODO only bind if destination or service is active else unbind*/
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,14 +56,24 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(true)
             }
             val navController = rememberNavController()
+            val pagerState = rememberPagerState()
+            navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                if (destination.route == Screen.Clock.route){
+                    when(pagerState.currentPage){
+                        0 -> {
+
+                        }
+                        1 -> {}
+                    }
+                }
+            }
             TodoTheme(isDarkTheme = isDarkTheme.value) {
                 MyDrawer(
                     themeButton = {
                         ThemeToggleButton(isDarkTheme = isDarkTheme)
                     },
                     content = {
-                        if(isBound){ SetupNavGraph(navController = navController, service, isBound) }
-                        else { SetupNavGraph(navController, null, isBound) }
+                         SetupNavGraph(navController, if (isBound) service else null, isBound, pagerState)
                     },
                     navController = navController
                 )

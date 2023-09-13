@@ -1,7 +1,7 @@
 package com.ramatonn.todo.util.navigation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,7 +14,7 @@ import com.ramatonn.todo.ui.timer.TopNavigationClockView
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SetupNavGraph(navController: NavHostController, service: StopwatchService?, isBound: Boolean) {
+fun SetupNavGraph(navController: NavHostController, service: StopwatchService?, isBound: Boolean, pagerState: PagerState) {
 
     NavHost(
         navController = navController,
@@ -29,7 +29,6 @@ fun SetupNavGraph(navController: NavHostController, service: StopwatchService?, 
                 { /*TimerView(service = service!!)*/ }
             )
             val items = listOf("Stopwatch", "Timer")
-            val pagerState = rememberPagerState()
             TopNavigationClockView(items, composables, pagerState, service!!)
         }
     }
