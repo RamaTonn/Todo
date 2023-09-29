@@ -123,7 +123,7 @@ class StopwatchService : Service() {
         clockState.value = ClockState.STOPPED
     }
 
-    fun startClock() {
+    private fun startClock() {
         clockState.value = ClockState.STARTED
         timer = fixedRateTimer(initialDelay = 10L, period = 10L) {
             timePassedMillis.value += 10
@@ -144,18 +144,18 @@ class StopwatchService : Service() {
 
     @SuppressLint("RestrictedApi")
     fun setResumeButton() {
-        notificationBuilder.addAction(0, "Resume", ServiceHelper.resumePendingIntent(this)
+        notificationBuilder.addAction(0, "Resume", StopwatchServiceHelper.resumePendingIntent(this)
         )
     }
 
     @SuppressLint("RestrictedApi")
     fun setPauseButton() {
-        notificationBuilder.addAction(0, "Pause", ServiceHelper.pausePendingIntent(this))
+        notificationBuilder.addAction(0, "Pause", StopwatchServiceHelper.pausePendingIntent(this))
     }
 
     @SuppressLint("RestrictedApi")
     fun setCancelButton() {
-        notificationBuilder.addAction(0, "Cancel", ServiceHelper.cancelPendingIntent(this)
+        notificationBuilder.addAction(0, "Cancel", StopwatchServiceHelper.cancelPendingIntent(this)
         )
     }
 

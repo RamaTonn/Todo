@@ -7,29 +7,55 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ramatonn.todo.service.StopwatchService
+import com.ramatonn.todo.service.TimerService
 import com.ramatonn.todo.ui.task_list.TaskListScreen
 import com.ramatonn.todo.ui.timer.StopwatchView
+import com.ramatonn.todo.ui.timer.TimerView
 import com.ramatonn.todo.ui.timer.TopNavigationClockView
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SetupNavGraph(navController: NavHostController, service: StopwatchService?, isBound: Boolean, pagerState: PagerState) {
+fun SetupNavGraph(
+    navController: NavHostController,
+    stopwatchService: StopwatchService?,
+    isStopwatchBound: Boolean,
+    timerService: TimerService?,
+    isTimerBound: Boolean,
+    pagerState: PagerState,
+    initialDestination: String,
+    clockType: Int
+) {
 
     NavHost(
         navController = navController,
-        startDestination = if (isBound) Screen.Clock.route else Screen.TaskList.route
+        startDestination = initialDestination
     ) {
         composable(route = Screen.TaskList.route) {
             TaskListScreen()
         }
         composable(route = Screen.Clock.route) {
             val composables = listOf<@Composable () -> Unit>(
-                { StopwatchView(service = service!!) },
-                { /*TimerView(service = service!!)*/ }
+                {
+                    if (stopwatchService != null) {
+                        StopwatchView(service = stopwatchService)
+                    }
+                },
+                {
+                    if (timerService != null) {
+                        TimerView(service = timerService)
+                    }
+                }
             )
             val items = listOf("Stopwatch", "Timer")
-            TopNavigationClockView(items, composables, pagerState, service!!)
+            if (isStopwatchBound || isTimerBound) {
+                TopNavigationClockView(
+                    items,
+                    composables,
+                    pagerState,
+                    clockType
+                )
+            }
         }
     }
 }
