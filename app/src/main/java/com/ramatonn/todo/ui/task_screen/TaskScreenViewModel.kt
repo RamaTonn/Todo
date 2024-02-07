@@ -15,7 +15,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -64,4 +63,5 @@ class TaskScreenViewModel @Inject constructor(
             taskRepository.deleteTask(task = task!!)
         }
     }
+
 }

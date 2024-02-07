@@ -34,6 +34,7 @@ fun SetupNavGraph(
         composable(route = Screen.TaskList.route) {
             TaskListScreen()
         }
+        composable(route = Screen.Alerts.route){}
         composable(route = Screen.Clock.route) {
             val composables = listOf<@Composable () -> Unit>(
                 {

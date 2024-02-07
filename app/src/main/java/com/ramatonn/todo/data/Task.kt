@@ -3,7 +3,6 @@ package com.ramatonn.todo.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Entity
@@ -11,6 +10,7 @@ data class Task(
 
     val title: String,
     var complete: Boolean = false,
+    var favourite: Boolean = false,
     val startDate: LocalDate = LocalDate.now(),
     val nextDate: LocalDate = startDate,
     val deadlineDate: LocalDate? = null,

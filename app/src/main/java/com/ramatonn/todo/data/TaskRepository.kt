@@ -11,4 +11,6 @@ interface TaskRepository {
     fun getTasks(): Flow<List<Task>>
 
     fun getTaskById(id: Int): Task?
+
+    fun getDeletedTask(): Task?
 }

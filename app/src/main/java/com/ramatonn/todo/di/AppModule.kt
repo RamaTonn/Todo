@@ -2,6 +2,9 @@ package com.ramatonn.todo.di
 
 import android.app.Application
 import androidx.room.Room
+import com.ramatonn.todo.data.AlertDatabase
+import com.ramatonn.todo.data.AlertRepository
+import com.ramatonn.todo.data.AlertRepositoryImpl
 import com.ramatonn.todo.data.CategoryDatabase
 import com.ramatonn.todo.data.CategoryRepository
 import com.ramatonn.todo.data.CategoryRepositoryImpl
@@ -41,5 +44,17 @@ object AppModule {
     @Singleton
     fun provideCategoryRepository(db: CategoryDatabase): CategoryRepository{
         return CategoryRepositoryImpl(db.dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAlertDatabase(app: Application): AlertDatabase{
+        return Room.databaseBuilder(app, AlertDatabase::class.java, "alert_db").build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAlertRepository(db: AlertDatabase): AlertRepository {
+        return AlertRepositoryImpl(db.dao)
     }
 }

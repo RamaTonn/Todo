@@ -9,17 +9,17 @@ import com.ramatonn.todo.service.TimerServiceHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ServiceScoped
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Named
+import javax.inject.Singleton
 
 
 @Module
-@InstallIn(ServiceComponent::class)
+@InstallIn(SingletonComponent::class)
 object NotificationModule {
 
-    @ServiceScoped
+    @Singleton
     @Provides
     @Named("Task")
     fun provideTaskNotificationBuilder(
@@ -28,7 +28,7 @@ object NotificationModule {
         return NotificationCompat.Builder(context, com.ramatonn.todo.util.TASK_NOTIFICATION_CHANNEL_ID)
     }
 
-    @ServiceScoped
+    @Singleton
     @Provides
     @Named("Stopwatch")
     fun provideStopwatchNotificationBuilder(
@@ -45,7 +45,7 @@ object NotificationModule {
             .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
     }
 
-    @ServiceScoped
+    @Singleton
     @Provides
     @Named("Timer")
     fun provideTimerNotificationBuilder(
@@ -61,7 +61,7 @@ object NotificationModule {
             .setContentIntent(TimerServiceHelper.clickPendingIntent(context))
     }
 
-    @ServiceScoped
+    @Singleton
     @Provides
     fun provideNotificationManager(
         @ApplicationContext context: Context

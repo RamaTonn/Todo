@@ -4,6 +4,11 @@ import kotlinx.coroutines.flow.Flow
 
 class TaskRepositoryImpl(private val dao: TaskDAO): TaskRepository {
 
+    private val deletedTask: Task? = null
+    override fun getDeletedTask(): Task? {
+        return deletedTask
+    }
+
     override suspend fun upsertTask(task: Task) {
         dao.upsertTask(task)
     }

@@ -15,15 +15,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
+import com.ramatonn.todo.data.Alert
 import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.service.TimerService
 import com.ramatonn.todo.ui.theme.ThemeToggleButton
 import com.ramatonn.todo.ui.theme.TodoTheme
+import com.ramatonn.todo.util.AlarmSchedulerImpl
 import com.ramatonn.todo.util.CLOCK_TYPE
 import com.ramatonn.todo.util.navigation.MyDrawer
 import com.ramatonn.todo.util.navigation.Screen
 import com.ramatonn.todo.util.navigation.SetupNavGraph
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalTime
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -59,11 +63,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val scheduler = AlarmSchedulerImpl(this)
+
     /*TODO only bind if destination or service is active else unbind*/
 
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        scheduler.schedule(
+            Alert(
+                name ="H20 Reminder",
+                message = "Seek fluid intake",
+                period = 45 * 60 * 1000L,
+                startTime = LocalTime.of(10, 0),
+                endTime = LocalTime.of(23, 59),
+            )
+        )
 
         clockType = intent.getIntExtra(CLOCK_TYPE, -1)
 
@@ -113,8 +129,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
             TodoTheme(isDarkTheme = isDarkTheme.value) {
+
                 MyDrawer(themeButton = {
-                    ThemeToggleButton(isDarkTheme = isDarkTheme)
+                      ThemeToggleButton(isDarkTheme = isDarkTheme)
+
                 }, content = {
                     SetupNavGraph(
                         navController,

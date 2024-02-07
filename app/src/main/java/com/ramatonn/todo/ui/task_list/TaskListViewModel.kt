@@ -2,11 +2,8 @@ package com.ramatonn.todo.ui.task_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ramatonn.todo.data.CategoryRepository
-import com.ramatonn.todo.data.CategoryRepositoryImpl
 import com.ramatonn.todo.data.Task
 import com.ramatonn.todo.data.TaskRepository
-import com.ramatonn.todo.data.TaskRepositoryImpl
 import com.ramatonn.todo.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -16,9 +13,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class TaskListViewModel @Inject constructor(private val taskRepository: TaskRepository/*, private val categoryRepository: CategoryRepository*/) : ViewModel() {
-
-    /*val categories = categoryRepository.getCategories()*/
+class TaskListViewModel @Inject constructor(private val taskRepository: TaskRepository) : ViewModel() {
 
     val tasks = taskRepository.getTasks()
 
@@ -26,7 +21,7 @@ class TaskListViewModel @Inject constructor(private val taskRepository: TaskRepo
 
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    private var deletedTask: Task? = null
+    private var deletedTask: Task? = taskRepository.getDeletedTask()
 
     fun onEvent(event: TaskListEvent) {
         when (event) {
@@ -36,21 +31,24 @@ class TaskListViewModel @Inject constructor(private val taskRepository: TaskRepo
                 _uiEvent.send(UiEvent.ShowSnackbar(message = "Task deleted", action = "Undo"))
             }
 
-            is TaskListEvent.OnAddTaskClick -> viewModelScope.launch {
-                _uiEvent.send(UiEvent.OpenDialog(-1))
-            }
-
             is TaskListEvent.OnCompletedChange -> viewModelScope.launch {
                 taskRepository.upsertTask(event.task.copy(complete = event.isCompleted))
             }
 
-            is TaskListEvent.OnTaskEditClick -> viewModelScope.launch {
-                _uiEvent.send(UiEvent.OpenDialog(event.task.id))
+            is TaskListEvent.OnFavouriteChange -> viewModelScope.launch {
+                taskRepository.upsertTask(event.task.copy(favourite = event.isFavourite))
             }
 
-            TaskListEvent.OnUndoDeleteClick -> deletedTask?.let {
+            is TaskListEvent.OnAddEditTaskClick -> viewModelScope.launch {
+                _uiEvent.send(UiEvent.OpenDialog(event.task))
+            }
+
+            is TaskListEvent.OnUndoDeleteClick -> deletedTask?.let {
                 viewModelScope.launch { taskRepository.upsertTask(it) }
             }
+
         }
     }
+
+
 }

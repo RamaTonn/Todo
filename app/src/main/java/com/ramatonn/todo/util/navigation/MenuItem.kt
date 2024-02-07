@@ -4,5 +4,6 @@ import com.ramatonn.todo.R
 
 sealed class MenuItem(val id:String, val text:String, val iconID: Int, val route: String){
     object TaskList: MenuItem("tasks", "Tasks", R.drawable.round_checklist_24, Screen.TaskList.route)
+    object Alerts: MenuItem("alerts", "Alerts", R.drawable.round_notifications_24, Screen.Alerts.route)
     object Timer: MenuItem("timer", "Timer", R.drawable.round_timer_24, Screen.Clock.route)
 }

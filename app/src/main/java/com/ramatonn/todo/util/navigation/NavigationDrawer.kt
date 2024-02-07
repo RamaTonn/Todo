@@ -34,9 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.ramatonn.todo.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -101,7 +99,7 @@ fun MyDrawer(content: @Composable () -> Unit, themeButton: @Composable (() -> Un
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val items = listOf(MenuItem.TaskList,MenuItem.Timer)
+    val items = listOf(MenuItem.TaskList,MenuItem.Alerts,MenuItem.Timer)
 
     val selectedItem = remember { mutableStateOf(items[0]) }
 
