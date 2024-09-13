@@ -1,8 +1,8 @@
-package com.ramatonn.todo.data
+package com.ramatonn.todo.data.alert
 
 import kotlinx.coroutines.flow.Flow
 
-class AlertRepositoryImpl(private val dao: AlertDAO):AlertRepository {
+class AlertRepositoryImpl(private val dao: AlertDAO): AlertRepository {
     override suspend fun upsertAlert(alert: Alert) {
         dao.upsertAlert(alert)
     }

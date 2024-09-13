@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ramatonn.todo.data.Alert
-import com.ramatonn.todo.data.AlertRepository
+import com.ramatonn.todo.data.alert.Alert
+import com.ramatonn.todo.data.alert.AlertRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -21,7 +21,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ramatonn.todo.R
-import com.ramatonn.todo.data.Alert
+import com.ramatonn.todo.data.alert.Alert
 import java.time.LocalTime
 
 @Composable

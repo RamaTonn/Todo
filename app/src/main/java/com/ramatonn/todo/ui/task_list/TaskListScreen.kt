@@ -1,49 +1,32 @@
 package com.ramatonn.todo.ui.task_list
 
-import android.annotation.SuppressLint
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.ramatonn.todo.data.Task
-import com.ramatonn.todo.ui.task_screen.TaskScreen
+import com.ramatonn.todo.data.task.Task
+import com.ramatonn.todo.util.UiEvent
 import com.ramatonn.todo.util.navigation.MyFAB
 
 //import com.ramcosta.composedestinations.annotation.Destination
 //import com.ramcosta.composedestinations.annotation.RootNavGraph
 
+/*
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -137,3 +120,68 @@ fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
     }
 }
 
+*/
+
+
+@Composable
+fun TaskListScreen(viewModel: TaskListViewModel = hiltViewModel()) {
+
+    val tasks by viewModel.tasks.collectAsState(initial = emptyList())
+
+    var task by remember {
+        mutableStateOf<Task?>(null)
+    }
+    val isDialogOpen = remember {
+        mutableStateOf(false)
+    }
+
+    val snackbarState = remember {
+        SnackbarHostState()
+    }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true){
+        viewModel.uiEvent.collect {event ->
+            when (event){
+                is UiEvent.ShowSnackbar -> {
+                    val result = snackbarState.showSnackbar(
+                        message = event.message,
+                        actionLabel = event.action
+                    )
+                    if (result == SnackbarResult.ActionPerformed){
+                        viewModel.onEvent(TaskListEvent.OnUndoDeleteClick)
+                    }
+                }
+                is UiEvent.OpenDialog -> {
+                    task = event.task
+                    isDialogOpen.value = true
+                    Log.i("Dialog", "TaskListScreen: Dialog Opened")
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    Scaffold(floatingActionButton = {
+        MyFAB {
+            viewModel.onEvent(TaskListEvent.OnAddEditTaskClick(null))
+        }
+    }, snackbarHost = { SnackbarHost(hostState = snackbarState) }) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+        ) {
+            itemsIndexed(tasks) {index, currTask ->
+                TaskItem(task = currTask, onEvent = {event ->
+                    viewModel.onEvent(event)
+                })
+                if (index < tasks.lastIndex){
+                    Divider()
+                }
+            }
+        }
+    }
+
+    TaskDialog(task = task, onEvent = {event -> viewModel.onEvent(event)}, isDialogOpen = isDialogOpen)
+    /*TaskScreen(showBottomSheet = isDialogOpen, snackbarHostState = snackbarState, scope = scope, task = task)*/
+}

@@ -1,6 +1,10 @@
 package com.ramatonn.todo.data
 
 import androidx.room.TypeConverter
+import com.google.gson.Gson
+import com.google.gson.JsonParser
+/*TODO Change GSON to kotlin serializable*/
+import com.ramatonn.todo.data.task.RepeatPattern
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -38,14 +42,22 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromRepeatability(repeatability: Repeatability): String{
-        return "${repeatability.days},${repeatability.months},${repeatability.years}"
+    fun fromRepeatPattern(repeatPattern: RepeatPattern): String{
+        return Gson().toJson(repeatPattern)
     }
 
     @TypeConverter
-    fun toRepeatability(repeatability: String): Repeatability{
-        val list = repeatability.split(",")
-        return Repeatability(list[0].toInt(),list[1].toInt(),list[2].toInt())
+    fun toRepeatPattern(json: String): RepeatPattern {
+        var output: RepeatPattern = RepeatPattern.Daily
+        val obj = JsonParser.parseString(json).asJsonObject
+        when(obj["tag"].asString){
+            "DAILY" -> output = RepeatPattern.Daily
+            "WEEKLY" -> output = Gson().fromJson(json, RepeatPattern.Weekly::class.java)
+            "MONTHLY_DAY" -> output = Gson().fromJson(json, RepeatPattern.MonthlyOnDay::class.java)
+            "MONTHLY_WEEK" -> output = Gson().fromJson(json, RepeatPattern.MonthlyOnSpecificWeek::class.java)
+            "YEARLY" -> output = Gson().fromJson(json, RepeatPattern.Yearly::class.java)
+        }
+        return output
     }
 
     @TypeConverter

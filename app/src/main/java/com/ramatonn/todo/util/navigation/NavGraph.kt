@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.service.TimerService
+import com.ramatonn.todo.ui.exercises.ExerciseScreen
 import com.ramatonn.todo.ui.task_list.TaskListScreen
 import com.ramatonn.todo.ui.timer.StopwatchView
 import com.ramatonn.todo.ui.timer.TimerView
@@ -34,7 +35,9 @@ fun SetupNavGraph(
         composable(route = Screen.TaskList.route) {
             TaskListScreen()
         }
-        composable(route = Screen.Alerts.route){}
+        composable(route = Screen.Alerts.route){
+
+        }
         composable(route = Screen.Clock.route) {
             val composables = listOf<@Composable () -> Unit>(
                 {
@@ -57,6 +60,10 @@ fun SetupNavGraph(
                     clockType
                 )
             }
+        }
+
+        composable(route = Screen.Exercises.route) {
+            ExerciseScreen()
         }
     }
 }

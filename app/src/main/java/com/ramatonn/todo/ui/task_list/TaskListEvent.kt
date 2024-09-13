@@ -1,6 +1,6 @@
 package com.ramatonn.todo.ui.task_list
 
-import com.ramatonn.todo.data.Task
+import com.ramatonn.todo.data.task.Task
 
 sealed class TaskListEvent{
     data class DeleteTaskClick(val task: Task): TaskListEvent()
@@ -8,4 +8,5 @@ sealed class TaskListEvent{
     data class OnFavouriteChange(val task: Task, val isFavourite: Boolean): TaskListEvent()
     object OnUndoDeleteClick: TaskListEvent()
     data class OnAddEditTaskClick(val task: Task?): TaskListEvent()
+    data class OnSaveClick(val task: Task): TaskListEvent()
 }

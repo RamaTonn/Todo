@@ -1,4 +1,4 @@
-package com.ramatonn.todo.data
+package com.ramatonn.todo.data.category
 
 import kotlinx.coroutines.flow.Flow
 

@@ -1,4 +1,4 @@
-package com.ramatonn.todo.data
+package com.ramatonn.todo.data.category
 
 import androidx.room.Dao
 import androidx.room.Delete

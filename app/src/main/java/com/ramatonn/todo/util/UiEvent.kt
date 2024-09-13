@@ -1,6 +1,6 @@
 package com.ramatonn.todo.util
 
-import com.ramatonn.todo.data.Task
+import com.ramatonn.todo.data.task.Task
 
 sealed class UiEvent {
 

@@ -2,8 +2,8 @@ package com.ramatonn.todo.ui.task_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ramatonn.todo.data.Task
-import com.ramatonn.todo.data.TaskRepository
+import com.ramatonn.todo.data.task.Task
+import com.ramatonn.todo.data.task.TaskRepository
 import com.ramatonn.todo.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -33,6 +33,7 @@ class TaskListViewModel @Inject constructor(private val taskRepository: TaskRepo
 
             is TaskListEvent.OnCompletedChange -> viewModelScope.launch {
                 taskRepository.upsertTask(event.task.copy(complete = event.isCompleted))
+
             }
 
             is TaskListEvent.OnFavouriteChange -> viewModelScope.launch {
@@ -45,6 +46,10 @@ class TaskListViewModel @Inject constructor(private val taskRepository: TaskRepo
 
             is TaskListEvent.OnUndoDeleteClick -> deletedTask?.let {
                 viewModelScope.launch { taskRepository.upsertTask(it) }
+            }
+
+            is TaskListEvent.OnSaveClick -> viewModelScope.launch {
+                taskRepository.upsertTask(event.task)
             }
 
         }

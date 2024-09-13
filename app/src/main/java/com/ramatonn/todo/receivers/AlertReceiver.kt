@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -24,20 +23,19 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlarmReceiver : BroadcastReceiver() {
+class AlertReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var notificationManager: NotificationManager
 
-    lateinit var notificationBuilder: NotificationCompat.Builder
-
-    lateinit var audioManager: AudioManager
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
         val name = intent?.getStringExtra(ALERT_NAME) ?: return
         val endTime = LocalTime.parse(intent.getStringExtra(ALERT_END_TIME))
         val startTime = LocalTime.parse(intent.getStringExtra(ALERT_START_TIME))
+
         if (LocalTime.now(ZoneId.systemDefault()).isAfter(endTime) || startTime.isAfter(LocalTime.now(ZoneId.systemDefault()))) {
             Log.i("Alert", "Active: ${LocalTime.now(ZoneId.systemDefault()).isAfter(endTime)}, ${LocalTime.now(ZoneId.systemDefault())}, EndTime: $endTime")
             return
@@ -45,21 +43,6 @@ class AlarmReceiver : BroadcastReceiver() {
         else {
             val say = intent.getStringExtra(ALERT_MESSAGE)
             val play = intent.getStringExtra(ALERT_SOUND)
-
-            /*context?.let {
-                audioManager = it.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            }
-
-            val mp = MediaPlayer.create(
-                context,
-                Uri.parse(play),
-                null,
-                AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build(),
-                audioManager.generateAudioSessionId()
-            )
-            mp.setOnCompletionListener {
-                it.reset()
-            }*/
 
             val channel = NotificationChannel(
                 ALERT_CHANNEL_ID, ALERT_CHANNEL, NotificationManager.IMPORTANCE_HIGH
@@ -82,7 +65,6 @@ class AlarmReceiver : BroadcastReceiver() {
 
             notificationManager.createNotificationChannel(channel)
             notificationManager.notify(5, notification)
-//            mp.start()
             Log.i("Alert", "onReceive: $name, $play")
         }
     }

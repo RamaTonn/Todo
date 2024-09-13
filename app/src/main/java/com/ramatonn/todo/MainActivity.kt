@@ -15,22 +15,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
-import com.ramatonn.todo.data.Alert
+import com.ramatonn.todo.data.alert.Alert
 import com.ramatonn.todo.service.StopwatchService
 import com.ramatonn.todo.service.TimerService
 import com.ramatonn.todo.ui.theme.ThemeToggleButton
 import com.ramatonn.todo.ui.theme.TodoTheme
-import com.ramatonn.todo.util.AlarmSchedulerImpl
+import com.ramatonn.todo.util.AlarmScheduler
 import com.ramatonn.todo.util.CLOCK_TYPE
 import com.ramatonn.todo.util.navigation.MyDrawer
 import com.ramatonn.todo.util.navigation.Screen
 import com.ramatonn.todo.util.navigation.SetupNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var scheduler: AlarmScheduler
 
     private var initialDestination by mutableStateOf(Screen.TaskList.route)
     private var clockType by mutableStateOf(-1)
@@ -63,7 +67,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private val scheduler = AlarmSchedulerImpl(this)
 
     /*TODO only bind if destination or service is active else unbind*/
 
@@ -71,7 +74,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        scheduler.schedule(
+        scheduler.scheduleAlert(
             Alert(
                 name ="H20 Reminder",
                 message = "Seek fluid intake",
@@ -113,6 +116,7 @@ class MainActivity : ComponentActivity() {
                     Intent(this, TimerService::class.java).also { intent ->
                         bindService(intent, timerConnection, Context.BIND_AUTO_CREATE)
                     }
+
                     /*when (pagerState.currentPage) {
                         0 -> {
                             Intent(this, StopwatchService::class.java).also { intent ->

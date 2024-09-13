@@ -1,4 +1,4 @@
-package com.ramatonn.todo.ui.task_screen
+package com.ramatonn.todo.ui.task_list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,22 +7,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -33,23 +24,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramatonn.todo.R
-import com.ramatonn.todo.data.Task
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import com.ramatonn.todo.data.task.Task
 
 
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
@@ -115,7 +99,10 @@ fun TaskScreen(
                     }),
                     maxLines = 1
                 )
-                Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     when (deadlineDate) {
                         null -> IconButton(onClick = { showDateDialog = true }) {
                             Icon(
@@ -124,11 +111,17 @@ fun TaskScreen(
                             )
                         }
 
-                        else -> Card(modifier = Modifier.padding(2.dp), shape = MaterialTheme.shapes.small) {
-                            Text(text = deadlineDate!!.format(DateTimeFormatter.ofPattern("d, MMM")), modifier = Modifier.padding(2.dp))
+                        else -> Card(
+                            modifier = Modifier.padding(2.dp),
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Text(
+                                text = deadlineDate!!.format(DateTimeFormatter.ofPattern("d, MMM")),
+                                modifier = Modifier.padding(2.dp)
+                            )
                         }
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {}) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.round_repeat_24),
                             contentDescription = "Repeat"
@@ -193,13 +186,16 @@ fun TaskScreen(
                 }
 
             }) {
-                DatePicker(/*headline = {
+                DatePicker(*/
+/*headline = {
                     DatePickerDefaults.DatePickerHeadline(
                         state = datePickerState,
                         remember { DatePickerFormatter() },
                         modifier = Modifier.padding(18.dp)
                     )
-                },*/ headline = null, showModeToggle = false, title = null, state = datePickerState)
+                },*//*
+ headline = null, showModeToggle = false, title = null, state = datePickerState
+                )
                 TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.extraSmall,
@@ -226,6 +222,119 @@ fun TaskScreen(
             }, text = {
                 TimePicker(state = timePickerState)
             })
+        }
+    }
+}
+*/
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TaskDialog(
+    task: Task?,
+    onEvent: (TaskListEvent) -> Unit,
+    isDialogOpen: MutableState<Boolean>,
+) {
+    if (isDialogOpen.value) {
+
+        var title by remember {
+            mutableStateOf(task?.title ?: "")
+        }
+
+        var date by remember {
+            mutableStateOf(task?.date)
+        }
+
+        var repeatPattern by remember {
+            mutableStateOf(task?.repeatPattern)
+        }
+
+        val datePickerState = rememberDatePickerState()
+
+        val timePickerState = rememberTimePickerState()
+
+        ModalBottomSheet(onDismissRequest = { isDialogOpen.value = false }, dragHandle = null) {
+
+            val focusManager = LocalFocusManager.current
+
+            Column {
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(text = "Title") },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        focusManager.clearFocus(true)
+                    }),
+                    maxLines = 1
+                )
+
+
+                Row(
+                    modifier = Modifier.padding(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.round_access_time_24),
+                            contentDescription = "Deadline"
+                        )
+                    }
+
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.round_repeat_24),
+                            contentDescription = "Repeat"
+                        )
+                    }
+
+                    if (task != null) {
+                        IconButton(onClick = {
+                            onEvent(TaskListEvent.DeleteTaskClick(task))
+                            isDialogOpen.value = false
+                        }) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.round_delete_24),
+                                contentDescription = "Repeat"
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(modifier = Modifier.padding(horizontal = 8.dp),
+                        enabled = title.isNotBlank(),
+                        onClick = {
+                            when (task) {
+                                null -> onEvent(
+                                    TaskListEvent.OnSaveClick(
+                                        Task(
+                                            title = title,
+                                            date = date,
+                                            repeatPattern = repeatPattern
+                                        )
+                                    )
+                                )
+
+                                else -> onEvent(
+                                    TaskListEvent.OnSaveClick(
+                                        task.copy(
+                                            title = title,
+                                            date = date,
+                                            repeatPattern = repeatPattern
+                                        )
+                                    )
+                                )
+                            }
+                            isDialogOpen.value = false
+                        }) {
+                        Text(text = "Save")
+                    }
+                }
+            }
         }
     }
 }

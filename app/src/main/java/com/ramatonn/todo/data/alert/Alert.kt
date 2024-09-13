@@ -1,4 +1,4 @@
-package com.ramatonn.todo.data
+package com.ramatonn.todo.data.alert
 
 import android.content.ContentResolver
 import androidx.room.Entity
